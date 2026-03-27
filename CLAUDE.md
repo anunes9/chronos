@@ -17,21 +17,42 @@ bun run preview  # Preview production build locally
 
 - **React 19** with the React Compiler enabled (via `babel-plugin-react-compiler`)
 - **TypeScript** in strict mode, targeting ES2023
-- **Vite 8** with `@vitejs/plugin-react` (Oxc-based JSX transform)
+- **Vite 8** with `@vitejs/plugin-react` (Oxc-based JSX transform) and `@tailwindcss/vite`
+- **Tailwind CSS v4** — configured via the Vite plugin, no `tailwind.config.js`
+- **shadcn/ui** — component library built on Radix UI; add components with `bunx shadcn@latest add <name>`
+- **React Router v7** for client-side routing
+- **@tanstack/react-query v5** for server state
+- **framer-motion** for animations
+- **lucide-react** for icons
 - **ESLint 9** using the flat config format (`eslint.config.js`)
 
 ## Architecture
 
-This is a fresh React + TypeScript + Vite project. Entry point is `src/main.tsx`, which mounts `<App />` into `#root` in `index.html`.
+Entry point is `src/main.tsx` → `<App />` in `index.html#root`.
+
+`App.tsx` sets up global providers (`QueryClientProvider`, `TooltipProvider`), `BrowserRouter`, and routes. All routes are defined there — add new pages above the catch-all `*` route.
+
+```
+src/
+  App.tsx            # Providers + route definitions
+  pages/             # Page-level components (one per route)
+  components/        # Shared/feature components
+  components/ui/     # shadcn/ui primitives (auto-generated, avoid manual edits)
+  lib/utils.ts       # cn() helper (Tailwind class merging)
+```
+
+### Path Alias
+
+`@/` maps to `src/`. Configured in `vite.config.ts` and `tsconfig.app.json`.
 
 ### React Compiler
 
-The project uses the React Compiler (via `@rolldown/plugin-babel` + `babel-plugin-react-compiler` in `vite.config.ts`). This means manual memoization (`useMemo`, `useCallback`, `memo`) is generally unnecessary — the compiler handles it automatically.
+Manual memoization (`useMemo`, `useCallback`, `memo`) is generally unnecessary — the compiler handles it automatically.
 
 ### TypeScript Config
 
-Two tsconfig files: `tsconfig.app.json` (source code) and `tsconfig.node.json` (build tooling like `vite.config.ts`). Both use `"moduleResolution": "bundler"`.
+`tsconfig.app.json` (source) and `tsconfig.node.json` (build tooling). Both use `"moduleResolution": "bundler"`. `verbatimModuleSyntax` is enabled — type-only imports must use `import type` or `import { type Foo }`.
 
-### ESLint
+### shadcn/ui
 
-Uses ESLint v9 flat config. Extends `@eslint/js`, `typescript-eslint`, `react-hooks`, and `react-refresh` recommended rules.
+Uses Tailwind v4 CSS variables for theming (defined in `src/index.css`). The `toaster` component is deprecated — use `sonner` instead.

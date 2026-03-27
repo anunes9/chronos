@@ -7,7 +7,7 @@ interface FlipDigitProps {
 
 const FlipDigit = ({ value }: FlipDigitProps) => {
   const [display, setDisplay] = useState(value);
-  const [flipping, setFlipping] = useState(false);
+  const [, setFlipping] = useState(false);
   const prevValue = useRef(value);
 
   useEffect(() => {
